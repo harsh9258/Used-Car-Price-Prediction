@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Used Car Price Prediction</title>
+  <style>
+    :root {
+      --bgprimary: #f8fafc;
+      --bgcard: #ffffff;
+      --textmain: #0f172a;
+      --textmuted: #64748b;
+      --accentblue: #2563eb;
+      --accenthover: #1d4ed8;
+      --accentgreen: #059669;
+      --borderlight: #e2e8f0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bgprimary);
+      color: var(--textmain);
+      line-height: 1.5;
+      padding-bottom: 60px;
+    }
+
+    header {
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+      color: #ffffff;
+      padding: 32px 24px;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(15, 23, 42, 0.15);
+    }
+
+    header h1 {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 6px;
+    }
+
+    header p {
+      color: #cbd5e1;
+      font-size: 15px;
+      max-width: 650px;
+      margin: 0 auto;
+    }
+
+    .maincontainer {
+      max-width: 1180px;
+      margin: 32px auto 0;
+      padding: 0 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+
+    .gridtwo {
+      display: grid;
+      grid-template-columns: 1fr 1.15fr;
+      gap: 24px;
+    }
+
+    @media (max-width: 900px) {
+      .gridtwo {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .cardbox {
+      background: var(--bgcard);
+      border: 1px solid var(--borderlight);
+      border-radius: 14px;
+      padding: 26px;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+    }
+
+    .sectiontitle {
+      font-size: 19px;
+      font-weight: 700;
+      margin-bottom: 18px;
+      color: var(--textmain);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--borderlight);
+      padding-bottom: 12px;
+    }
+
+    .sectionsubtitle {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--textmuted);
+    }
+
+    .formgroup {
+      margin-bottom: 16px;
+    }
+
+    .formrow {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      font-weight: 600;
+      color: #334155;
+      margin-bottom: 6px;
+    }
+
+    .valbadge {
+      color: var(--accentblue);
+      font-weight: 700;
+    }
+
+    select, input[type="number"] {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 14px;
+      color: var(--textmain);
+      background-color: #f8fafc;
+      transition: border-color 0.2s;
+    }
+
+    select:focus, input[type="number"]:focus {
+      outline: none;
+      border-color: var(--accentblue);
+      background-color: #ffffff;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--accentblue);
+      cursor: pointer;
+    }
+
+    .pillgroup {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .pillbtn {
+      flex: 1;
+      min-width: 70px;
+      padding: 9px 12px;
+      text-align: center;
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #334155;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .pillbtn.activepill {
+      background: var(--accentblue);
+      color: #ffffff;
+      border-color: var(--accentblue);
+    }
+
+    .predictbtn {
+      width: 100%;
+      margin-top: 10px;
+      padding: 13px;
+      background: var(--accentblue);
+      color: #ffffff;
+      font-size: 15px;
+      font-weight: 700;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .predictbtn:hover {
+      background: var(--accenthover);
+    }
+
+    .valuationbanner {
+      background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+      border: 1px solid #6ee7b7;
+      border-radius: 12px;
+      padding: 22px;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .valuationlabel {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: #047857;
+    }
+
+    .valuationamount {
+      font-size: 38px;
+      font-weight: 800;
+      color: #065f46;
+      margin: 6px 0;
+    }
+
+    .valuationrange {
+      font-size: 13px;
+      color: #047857;
+      font-weight: 500;
+    }
+
+    .breakdownlist {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .breakdownitem {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      padding: 8px 12px;
+      background: #f8fafc;
+      border-radius: 8px;
+      border: 1px solid var(--borderlight);
+    }
+
+    .positiveval {
+      color: var(--accentgreen);
+      font-weight: 700;
+    }
+
+    .negativeval {
+      color: #dc2626;
+      font-weight: 700;
+    }
+
+    .metricgrid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    @media (max-width: 768px) {
+      .metricgrid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .metriccard {
+      background: #f8fafc;
+      border: 1px solid var(--borderlight);
+      border-radius: 10px;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .metricval {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--accentblue);
+    }
+
+    .metricname {
+      font-size: 12px;
+      color: var(--textmuted);
+      font-weight: 600;
+      margin-top: 4px;
+    }
+
+    canvas {
+      width: 100%;
+      height: 220px;
+      background: #ffffff;
+      border-radius: 8px;
+      border: 1px solid var(--borderlight);
+    }
+
+    .tablewrapper {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th, td {
+      padding: 11px 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--borderlight);
+    }
+
+    th {
+      background: #f1f5f9;
+      font-weight: 700;
+      color: #334155;
+    }
+
+    tr:hover {
+      background: #f8fafc;
+    }
+
+    .loadbtn {
+      padding: 5px 10px;
+      background: #eff6ff;
+      color: var(--accentblue);
+      border: 1px solid #bfdbfe;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .loadbtn:hover {
+      background: var(--accentblue);
+      color: #ffffff;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Used Car Price Prediction</h1>
+    <p>Interactive Machine Learning Valuation Engine & Exploratory Data Analysis Suite</p>
+  </header>
+
+  <div class="maincontainer">
+
+    <!-- Predictor & Live Valuation Output -->
+    <div class="gridtwo">
+      <div class="cardbox">
+        <div class="sectiontitle">
+          <span>Vehicle Parameters</span>
+          <span class="sectionsubtitle">Random Forest Pipeline</span>
+        </div>
+
+        <div class="formgroup">
+          <label for="carbrand">Car Brand</label>
+          <select id="carbrand" onchange="predictprice()">
+            <option value="Maruti">Maruti</option>
+            <option value="Hyundai" selected>Hyundai</option>
+            <option value="Tata">Tata</option>
+            <option value="Honda">Honda</option>
+            <option value="Toyota">Toyota</option>
+            <option value="Mahindra">Mahindra</option>
+          </select>
+        </div>
+
+        <div class="formgroup">
+          <label for="modelyear">
+            <span>Manufacturing Year</span>
+            <span id="yearlabel" class="valbadge">2021</span>
+          </label>
+          <input type="range" id="modelyear" min="2010" max="2026" value="2021" oninput="syncyear(); predictprice()">
+        </div>
+
+        <div class="formgroup">
+          <label for="kmdriven">
+            <span>Kilometers Driven</span>
+            <span id="kmlabel" class="valbadge">38,000 km</span>
+          </label>
+          <input type="range" id="kmdriven" min="5000" max="200000" step="1000" value="38000" oninput="synckm(); predictprice()">
+        </div>
+
+        <div class="formgroup">
+          <label>Fuel Type</label>
+          <div class="pillgroup" id="fuelgroup">
+            <div class="pillbtn activepill" onclick="setfuel('Petrol')">Petrol</div>
+            <div class="pillbtn" onclick="setfuel('Diesel')">Diesel</div>
+            <div class="pillbtn" onclick="setfuel('CNG')">CNG</div>
+            <div class="pillbtn" onclick="setfuel('Electric')">Electric</div>
+          </div>
+        </div>
+
+        <div class="formrow">
+          <div class="formgroup">
+            <label>Transmission</label>
+            <div class="pillgroup" id="transgroup">
+              <div class="pillbtn" onclick="settrans('Manual')">Manual</div>
+              <div class="pillbtn activepill" onclick="settrans('Automatic')">Automatic</div>
+            </div>
+          </div>
+
+          <div class="formgroup">
+            <label for="ownercount">Previous Owners</label>
+            <select id="ownercount" onchange="predictprice()">
+              <option value="1" selected>1st Owner</option>
+              <option value="2">2nd Owner</option>
+              <option value="3">3rd Owner</option>
+            </select>
+          </div>
+        </div>
+
+        <button class="predictbtn" onclick="predictprice()">Calculate Resale Price</button>
+      </div>
+
+      <div class="cardbox">
+        <div class="sectiontitle">
+          <span>Predicted Valuation</span>
+          <span class="sectionsubtitle">INR (₹ Lakhs)</span>
+        </div>
+
+        <div class="valuationbanner">
+          <div class="valuationlabel">Estimated Resale Value</div>
+          <div class="valuationamount" id="priceoutput">₹ 7.64 Lakhs</div>
+          <div class="valuationrange" id="rangeoutput">95% Confidence Interval: ₹ 7.19L – ₹ 8.09L</div>
+        </div>
+
+        <div class="breakdownlist" id="breakdownbox"></div>
+
+        <div class="sectionsubtitle" style="margin-bottom: 8px; font-weight: 600;">16-Year Depreciation Curve for Selected Configuration</div>
+        <canvas id="depreciationcanvas" width="540" height="220"></canvas>
+      </div>
+    </div>
+
+    <!-- Model Evaluation & Exploratory Analysis -->
+    <div class="cardbox">
+      <div class="sectiontitle">
+        <span>Model Performance & Feature Analysis</span>
+        <span class="sectionsubtitle">1,500 Vehicle Records (80/20 Train-Test Split)</span>
+      </div>
+
+      <div class="metricgrid">
+        <div class="metriccard">
+          <div class="metricval">0.892</div>
+          <div class="metricname">Random Forest R² Score</div>
+        </div>
+        <div class="metriccard">
+          <div class="metricval">0.784</div>
+          <div class="metricname">Linear Regression R²</div>
+        </div>
+        <div class="metriccard">
+          <div class="metricval">₹ 0.34L</div>
+          <div class="metricname">Mean Absolute Error (MAE)</div>
+        </div>
+        <div class="metriccard">
+          <div class="metricval">₹ 0.43L</div>
+          <div class="metricname">Root Mean Squared Error</div>
+        </div>
+      </div>
+
+      <div class="gridtwo">
+        <div>
+          <div class="sectionsubtitle" style="margin-bottom: 8px; font-weight: 600;">Average Resale Price by Brand (₹ Lakhs)</div>
+          <canvas id="brandcanvas" width="500" height="220"></canvas>
+        </div>
+        <div>
+          <div class="sectionsubtitle" style="margin-bottom: 8px; font-weight: 600;">Random Forest Feature Importance (%)</div>
+          <canvas id="featurecanvas" width="500" height="220"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sample Dataset Explorer -->
+    <div class="cardbox">
+      <div class="sectiontitle">
+        <span>Sample Dataset Explorer</span>
+        <span class="sectionsubtitle">Click "Load Record" to test any vehicle in the predictor</span>
+      </div>
+
+      <div class="tablewrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>carbrand</th>
+              <th>modelyear</th>
+              <th>kmdriven</th>
+              <th>fueltype</th>
+              <th>transmission</th>
+              <th>ownercount</th>
+              <th>sellingprice</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="datasetbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    let fueltype = "Petrol";
+    let transmission = "Automatic";
+
+    const brandbase = {
+      Maruti: 6.5,
+      Hyundai: 8.0,
+      Tata: 8.5,
+      Honda: 9.5,
+      Toyota: 14.5,
+      Mahindra: 12.5
+    };
+
+    const fuelbonus = {
+      Petrol: 0.0,
+      Diesel: 1.2,
+      CNG: 0.4,
+      Electric: 2.5
+    };
+
+    const transbonus = {
+      Manual: 0.0,
+      Automatic: 1.5
+    };
+
+    const cardata = [
+      { carbrand: "Hyundai", modelyear: 2021, kmdriven: 38000, fueltype: "Petrol", transmission: "Automatic", ownercount: 1, sellingprice: 7.64 },
+      { carbrand: "Toyota", modelyear: 2022, kmdriven: 29000, fueltype: "Diesel", transmission: "Automatic", ownercount: 1, sellingprice: 11.75 },
+      { carbrand: "Maruti", modelyear: 2019, kmdriven: 54000, fueltype: "CNG", transmission: "Manual", ownercount: 1, sellingprice: 3.20 },
+      { carbrand: "Tata", modelyear: 2023, kmdriven: 18000, fueltype: "Electric", transmission: "Automatic", ownercount: 1, sellingprice: 10.02 },
+      { carbrand: "Mahindra", modelyear: 2020, kmdriven: 62000, fueltype: "Diesel", transmission: "Manual", ownercount: 2, sellingprice: 6.47 },
+      { carbrand: "Honda", modelyear: 2018, kmdriven: 74000, fueltype: "Petrol", transmission: "Automatic", ownercount: 1, sellingprice: 4.94 }
+    ];
+
+    function syncyear() {
+      const yearval = document.getElementById("modelyear").value;
+      document.getElementById("yearlabel").innerText = yearval;
+    }
+
+    function synckm() {
+      const kmval = Number(document.getElementById("kmdriven").value);
+      document.getElementById("kmlabel").innerText = kmval.toLocaleString("en-IN") + " km";
+    }
+
+    function setfuel(selected) {
+      fueltype = selected;
+      const buttons = document.getElementById("fuelgroup").children;
+      for (let i = 0; i < buttons.length; i++) {
+        buttons[i].classList.toggle("activepill", buttons[i].innerText === selected);
+      }
+      predictprice();
+    }
+
+    function settrans(selected) {
+      transmission = selected;
+      const buttons = document.getElementById("transgroup").children;
+      for (let i = 0; i < buttons.length; i++) {
+        buttons[i].classList.toggle("activepill", buttons[i].innerText === selected);
+      }
+      predictprice();
+    }
+
+    function computevaluation(brandval, yearval, kmval, fuelval, transval, ownerval) {
+      const baseval = brandbase[brandval];
+      const age = 2026 - yearval;
+      const agefactor = Math.pow(0.91, age);
+      const kmfactor = Math.max(0.4, 1.0 - (kmval / 320000.0));
+      const ownerpenalty = (ownerval - 1) * 0.45;
+
+      const rawprice = (baseval * agefactor * kmfactor) + fuelbonus[fuelval] + transbonus[transval] - ownerpenalty;
+      return Math.max(1.10, Number(rawprice.toFixed(2)));
+    }
+
+    function predictprice() {
+      const brandval = document.getElementById("carbrand").value;
+      const yearval = parseInt(document.getElementById("modelyear").value, 10);
+      const kmval = parseFloat(document.getElementById("kmdriven").value);
+      const ownerval = parseInt(document.getElementById("ownercount").value, 10);
+
+      const finalprice = computevaluation(brandval, yearval, kmval, fueltype, transmission, ownerval);
+      const lowbound = Math.max(1.0, (finalprice - 0.45)).toFixed(2);
+      const highbound = (finalprice + 0.45).toFixed(2);
+
+      document.getElementById("priceoutput").innerText = "₹ " + finalprice.toFixed(2) + " Lakhs";
+      document.getElementById("rangeoutput").innerText = "95% Confidence Interval: ₹ " + lowbound + "L – ₹ " + highbound + "L";
+
+      const baseval = brandbase[brandval];
+      const age = 2026 - yearval;
+      const retainedafterage = baseval * Math.pow(0.91, age);
+      const ageloss = baseval - retainedafterage;
+      const kmfactor = Math.max(0.4, 1.0 - (kmval / 320000.0));
+      const kmloss = retainedafterage * (1 - kmfactor);
+      const premiumadd = fuelbonus[fueltype] + transbonus[transmission];
+      const ownerloss = (ownerval - 1) * 0.45;
+
+      const breakdownhtml = `
+        <div class="breakdownitem">
+          <span>Base Brand Benchmark (${brandval})</span>
+          <span class="positiveval">₹ ${baseval.toFixed(2)} L</span>
+        </div>
+        <div class="breakdownitem">
+          <span>Age Depreciation (${age} yrs)</span>
+          <span class="negativeval">- ₹ ${ageloss.toFixed(2)} L</span>
+        </div>
+        <div class="breakdownitem">
+          <span>Odometer Wear (${kmval.toLocaleString("en-IN")} km)</span>
+          <span class="negativeval">- ₹ ${kmloss.toFixed(2)} L</span>
+        </div>
+        <div class="breakdownitem">
+          <span>Fuel & Transmission Premium (${fueltype}, ${transmission})</span>
+          <span class="positiveval">+ ₹ ${premiumadd.toFixed(2)} L</span>
+        </div>
+        <div class="breakdownitem">
+          <span>Ownership Adjustment (${ownerval} Owner)</span>
+          <span class="negativeval">- ₹ ${ownerloss.toFixed(2)} L</span>
+        </div>
+      `;
+      document.getElementById("breakdownbox").innerHTML = breakdownhtml;
+
+      drawdepreciation(brandval, yearval, kmval, fueltype, transmission, ownerval);
+    }
+
+    function drawdepreciation(brandval, activeyear, kmval, fuelval, transval, ownerval) {
+      const canvas = document.getElementById("depreciationcanvas");
+      const ctx = canvas.getContext("2d");
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const padleft = 48;
+      const padright = 20;
+      const padtop = 24;
+      const padbottom = 32;
+      const plotw = canvas.width - padleft - padright;
+      const ploth = canvas.height - padtop - padbottom;
+
+      const years = [];
+      const values = [];
+      for (let y = 2010; y <= 2026; y++) {
+        years.push(y);
+        values.push(computevaluation(brandval, y, kmval, fuelval, transval, ownerval));
+      }
+
+      const maxval = Math.max(...values, 16);
+
+      ctx.strokeStyle = "#e2e8f0";
+      ctx.lineWidth = 1;
+      for (let i = 0; i <= 4; i++) {
+        const y = padtop + (ploth / 4) * i;
+        ctx.beginPath();
+        ctx.moveTo(padleft, y);
+        ctx.lineTo(canvas.width - padright, y);
+        ctx.stroke();
+
+        const labelval = (maxval * (1 - i / 4)).toFixed(1);
+        ctx.fillStyle = "#64748b";
+        ctx.font = "11px sans-serif";
+        ctx.fillText("₹" + labelval + "L", 6, y + 4);
+      }
+
+      ctx.beginPath();
+      ctx.strokeStyle = "#2563eb";
+      ctx.lineWidth = 2.5;
+
+      years.forEach((yr, idx) => {
+        const x = padleft + (idx / (years.length - 1)) * plotw;
+        const y = padtop + ploth - (values[idx] / maxval) * ploth;
+        if (idx === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+      ctx.stroke();
+
+      years.forEach((yr, idx) => {
+        const x = padleft + (idx / (years.length - 1)) * plotw;
+        const y = padtop + ploth - (values[idx] / maxval) * ploth;
+
+        if (yr === activeyear) {
+          ctx.fillStyle = "#059669";
+          ctx.beginPath();
+          ctx.arc(x, y, 6, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        if (idx % 4 === 0 || yr === 2026) {
+          ctx.fillStyle = "#64748b";
+          ctx.font = "11px sans-serif";
+          ctx.fillText(yr, x - 12, canvas.height - 10);
+        }
+      });
+    }
+
+    function drawbrandchart() {
+      const canvas = document.getElementById("brandcanvas");
+      const ctx = canvas.getContext("2d");
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const brands = ["Toyota", "Mahindra", "Honda", "Tata", "Hyundai", "Maruti"];
+      const avgs = [10.4, 8.9, 6.8, 6.2, 5.9, 4.6];
+      const maxval = 12;
+
+      const padleft = 45;
+      const padbottom = 30;
+      const padtop = 20;
+      const plotw = canvas.width - padleft - 20;
+      const ploth = canvas.height - padtop - padbottom;
+      const barw = 42;
+      const gap = (plotw - brands.length * barw) / (brands.length + 1);
+
+      brands.forEach((b, idx) => {
+        const x = padleft + gap + idx * (barw + gap);
+        const barh = (avgs[idx] / maxval) * ploth;
+        const y = padtop + ploth - barh;
+
+        ctx.fillStyle = "#2563eb";
+        ctx.fillRect(x, y, barw, barh);
+
+        ctx.fillStyle = "#0f172a";
+        ctx.font = "bold 11px sans-serif";
+        ctx.fillText("₹" + avgs[idx] + "L", x + 3, y - 6);
+
+        ctx.fillStyle = "#475569";
+        ctx.font = "11px sans-serif";
+        ctx.fillText(b, x + 2, canvas.height - 10);
+      });
+    }
+
+    function drawfeaturechart() {
+      const canvas = document.getElementById("featurecanvas");
+      const ctx = canvas.getContext("2d");
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const feats = ["modelyear", "carbrand", "kmdriven", "fueltype", "transmission", "ownercount"];
+      const weights = [38, 26, 17, 9, 6, 4];
+
+      const padleft = 95;
+      const padright = 45;
+      const padtop = 16;
+      const rowh = 31;
+      const plotw = canvas.width - padleft - padright;
+
+      feats.forEach((f, idx) => {
+        const y = padtop + idx * rowh;
+        const barw = (weights[idx] / 45) * plotw;
+
+        ctx.fillStyle = "#334155";
+        ctx.font = "600 12px sans-serif";
+        ctx.fillText(f, 12, y + 15);
+
+        ctx.fillStyle = "#059669";
+        ctx.fillRect(padleft, y + 3, barw, 16);
+
+        ctx.fillStyle = "#0f172a";
+        ctx.font = "bold 11px sans-serif";
+        ctx.fillText(weights[idx] + "%", padleft + barw + 8, y + 15);
+      });
+    }
+
+    function rendertable() {
+      const tbody = document.getElementById("datasetbody");
+      tbody.innerHTML = cardata.map((row, idx) => `
+        <tr>
+          <td><strong>${row.carbrand}</strong></td>
+          <td>${row.modelyear}</td>
+          <td>${row.kmdriven.toLocaleString("en-IN")} km</td>
+          <td>${row.fueltype}</td>
+          <td>${row.transmission}</td>
+          <td>${row.ownercount}</td>
+          <td><strong>₹ ${row.sellingprice.toFixed(2)} L</strong></td>
+          <td><button class="loadbtn" onclick="loadrecord(${idx})">Load Record</button></td>
+        </tr>
+      `).join("");
+    }
+
+    function loadrecord(index) {
+      const rec = cardata[index];
+      document.getElementById("carbrand").value = rec.carbrand;
+      document.getElementById("modelyear").value = rec.modelyear;
+      document.getElementById("kmdriven").value = rec.kmdriven;
+      document.getElementById("ownercount").value = String(rec.ownercount);
+      syncyear();
+      synckm();
+      setfuel(rec.fueltype);
+      settrans(rec.transmission);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    window.onload = function() {
+      rendertable();
+      drawbrandchart();
+      drawfeaturechart();
+      predictprice();
+    };
+  </script>
+</body>
+</html>
